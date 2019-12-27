@@ -32,11 +32,11 @@ app.get("/",function(req,resp){
 app.use("/user",UserRoutes);
 app.use("/product",productRoutes);
 
-/* app.listen(3000,()=>{
+app.listen(3000,()=>{
     console.log("App is listening to port 3000");
-}) */
-https.createServer({
+})
+/* https.createServer({
     key: fs.readFileSync('./certificate/key.key'),
     cert: fs.readFileSync('./certificate/cert.crt'),
 }, app)
-.listen(3000);
+.listen(3000); */
