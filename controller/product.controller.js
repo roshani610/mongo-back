@@ -40,7 +40,7 @@ exports.getProduct=(req,resp)=>{
     }).catch(err=>{
         resp.status(500).send({"data":err,status:500})
     })
-}
+} 
 exports.updateProduct=(req,resp)=>{
     Product.updateOne(req.body).then(()=>{
         resp.status(200).send({"data":"updated successfully...",status:200});

@@ -14,4 +14,6 @@ router.get('/getProduct',productController.getProduct);
 router.post('/updateProduct',productController.updateProduct);
 router.delete('/deleteProduct',productController.deleteProduct);
 
+
+
 module.exports=router;

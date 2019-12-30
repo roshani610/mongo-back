@@ -10,4 +10,8 @@ router.get("/",(req,resp)=>{
 router.post("/register",userController.register);
 
 router.post("/login",userController.login);
+router.post('/editUser',userController.editUser);
+router.post('/listUser',userController.listUser);
+router.get('/getUser',userController.getUser);
+router.delete('/deleteUser',userController.deleteUser)
 module.exports=router;
