@@ -1,66 +1,157 @@
-var User=require('../model/user.model');
+const db = require("../model");
+const User = db.users;
+const Op = db.Sequelize.Op;
+// Create and Save a new User
+exports.create = (req, res) => {
+    // Validate request
+    if (!req.body.name) {
+      res.status(400).send({
+        message: "Content can not be empty!"
+      });
+      return;
+    }
+    // Create a User
+    const user = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      mobile:req.body.mobile
+    };
+    // Save User in the database
+    User.create(user)
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while creating the User."
+        });
+      });
+  };
+// Retrieve all Users from the database.
+exports.findAll = (req, res) => {
+ 
+  User.findAll()
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving users."
+      });
+    });
+};
+// Find a single User with an id
+exports.findOne = (req, res) => {
+    const id = req.params.id;
+    User.findByPk(id)
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Error retrieving User with id=" + id
+        });
+      });
+  
+};
 
-exports.register=(req,resp)=>{
-    if(req.body.content === ""){
-        return resp.status(404).send({"meesage":"data can not be empty","status":404});
-    }
-    User.create(req.body).then(()=>{
-       // console.log("regi",JSON.stringify(resp));
-       resp.status(200).send({"meesage":"Registered","status":200});
-    }).catch(err=>{
-         resp.status(500).send(err); 
+// Find a single User Email and password
+exports.login = (req, res) => {
+  console.log(req)
+  const email = req.query.email;
+  const password = req.query.password;
+  User.findOne(
+    {
+      where:{
+        [Op.and]:[
+          {email:email},
+          {password:password}
+        ]
+       
+      }
     })
-}
-exports.login=(req,resp)=>{
-    if(req.body.content === ""){
-        return resp.status(404).send("data can not be empty");
-    }
-    User.find(req.body).then((data)=>{
-        console.log(data);
-        if(data.length >=1){
-            resp.status(200).send({"meesage":"login successful","status":200});
-        }else{
-            resp.status(500).send({"message":"Username or Password is incorrect"});
+    .then(data => {
+      res.send({
+        status: "success",
+        data:data
+      });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving User with id=" + email
+      });
+    });
+
+};
+// Update a User by the id in the request
+exports.update = (req, res) => {
+    const id = req.params.id;
+    User.update(req.body, {
+        where: { id: id }
+    })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating User with id=" + id
+      });
+    });
+  
+};
+// Delete a User with the specified id in the request
+exports.delete = (req, res) => {
+  
+    const id = req.params.id;
+    User.destroy({
+      where: { id: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "User was deleted successfully!"
+          });
+        } else {
+          res.send({
+            message: `Cannot delete User with id=${id}. Maybe User was not found!`
+          });
         }
-    })
-}
-exports.editUser=(req,resp)=>{
-    if(req.body.content === ""){
-        return resp.status(404).send("data can not be empty");
-    }
-    User.updateOne(req.body).then(data=>{
-        resp.status(200).send({"message":"Updated successfully",status:200});
-    }).catch(err=>{
-        resp.send(500).send({"message":err,status:500});
-    })
-}
-exports.listUser=(req,resp)=>{
-    console.log("req::",req.body.search);
-    let where={};
-    if(req.body.search.value != undefined && req.body.search.value != "" ){
-        where={ $text: { $search: req.body.search.value } }
-    }
-    User.find(where).then((data)=>{
-        resp.status(200).send({"data":data,"length":data.length,"status":200});
-    }).catch(err=>{
-        console.log(err);
-        resp.status(500).send({"data":err,status:500})
-    })
-}
-exports.getUser=(req,resp)=>{
-    User.findById(req.query.params).then((data)=>{
-        resp.status(200).send({"data":data,status:200});
-    }).catch(err=>{
-        resp.status(500).send({"data":err,status:500})
-    })
-}
-exports.deleteUser=(req,resp)=>{
-    console.log(req.query.params);
-    User.deleteOne({ "_id" : req.query.params }).then((data)=>{
-        console.log("resp:",data);
-        resp.status(200).send({"data":data,status:200});
-    }).catch(err=>{
-        resp.status(500).send({"data":err,status:500})
-    })
-    
-}
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete User with id=" + id
+        });
+      });
+};
+// Delete all Users from the database.
+exports.deleteAll = (req, res) => {
+    User.destroy({
+        where: {},
+        truncate: false
+      })
+        .then(nums => {
+          res.send({ message: `${nums} Users were deleted successfully!` });
+        })
+        .catch(err => {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred while removing all users."
+          }); 
+        });
+  
+};
+// Find all published Users
+exports.findAllPublished = (req, res) => {
+  
+};
