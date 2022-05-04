@@ -6,6 +6,7 @@ const app=express();
 app.use(cors());
 app.use(body_parser.urlencoded({extended:true}));
 app.use(body_parser.json());
+const port = process.env.PORT || 8080;
 // const db = require("./model");
 // db.sequelize.sync({ force: true }).then(() => {
 //     console.log("Drop and re-sync db.");
@@ -17,7 +18,7 @@ app.get("/",function(req,resp){
     resp.status(200).send({"message": "hello world"});
 })
 
-app.listen(8080,()=>{
+app.listen(port,()=>{
     console.log("App is listening to port 8080");
 })
 

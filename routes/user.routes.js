@@ -5,6 +5,8 @@ module.exports = app => {
     router.post("/", users.create);
      // Login user
     router.get("/login", users.login);
+
+    router.get("/call", users.callQuery);
     // Retrieve all users
     router.get("/", users.findAll);
     // Retrieve all published users

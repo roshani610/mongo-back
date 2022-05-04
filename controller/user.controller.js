@@ -1,6 +1,12 @@
 const db = require("../model");
 const User = db.users;
 const Op = db.Sequelize.Op;
+exports.callQuery = (req,resp) =>{
+  db.sequelize.query('EXEC demo')
+  .then(result=>{
+    resp.send({"data":result});
+  });
+}
 // Create and Save a new User
 exports.create = (req, res) => {
     // Validate request
@@ -34,7 +40,8 @@ exports.findAll = (req, res) => {
  
   User.findAll()
     .then(data => {
-      res.send(data);
+      console.log(data);
+      res.send({"data": data});
     })
     .catch(err => {
       res.status(500).send({
